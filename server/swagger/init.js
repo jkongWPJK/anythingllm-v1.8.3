@@ -39,7 +39,7 @@ const endpointsFiles = [
   "../endpoints/api/userManagement/index.js",
   "../endpoints/api/openai/index.js",
   "../endpoints/api/embed/index.js",
-];
+].map(file => path.resolve(__dirname, file));
 
 swaggerAutogen(outputFile, endpointsFiles, doc).then(({ data }) => {
   // Remove Authorization parameters from arguments.

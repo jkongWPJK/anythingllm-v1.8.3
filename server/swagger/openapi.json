@@ -2193,9 +2193,6 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
             "description": "Document not found"
           },
@@ -2456,9 +2453,6 @@
           },
           "400": {
             "description": "Bad Request"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"

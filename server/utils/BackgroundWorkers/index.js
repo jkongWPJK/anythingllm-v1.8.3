@@ -12,6 +12,7 @@ class BackgroundService {
   #alwaysRunJobs = [
     {
       name: "cleanup-orphan-documents",
+      path: path.resolve(__dirname, "../../jobs/cleanup-orphan-documents.js"),
       timeout: "1m",
       interval: "12hr",
     },
@@ -22,6 +23,7 @@ class BackgroundService {
     // https://github.com/breejs/bree
     {
       name: "sync-watched-documents",
+      path: path.resolve(__dirname, "../../jobs/sync-watched-documents.js"),
       interval: "1hr",
     },
   ];
