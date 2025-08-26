@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(ls:*)"
+    ],
+    "additionalDirectories": [
+      "/mnt/c/Git/anything-llm"
+    ]
+  }
+}
