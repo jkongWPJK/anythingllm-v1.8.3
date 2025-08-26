@@ -18,7 +18,7 @@ export default function NewWorkspaceModal({ hideModal = noop }) {
     for (var [key, value] of form.entries()) data[key] = value;
     const { workspace, message } = await Workspace.new(data);
     if (!!workspace) {
-      window.location.href = paths.workspace.chat(workspace.slug);
+      window.location.href = "/llm" + paths.workspace.chat(workspace.slug);
     }
     setError(message);
   };
