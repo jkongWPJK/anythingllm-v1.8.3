@@ -104,7 +104,7 @@ export default function ActiveWorkspaces() {
                           href={
                             isActive
                               ? null
-                              : paths.workspace.chat(workspace.slug)
+                              : "/llm" + paths.workspace.chat(workspace.slug)
                           }
                           aria-current={isActive ? "page" : ""}
                           className={`
