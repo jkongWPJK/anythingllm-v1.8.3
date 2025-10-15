@@ -3,6 +3,7 @@ import { Warning } from "@phosphor-icons/react";
 import UserIcon from "../../../../UserIcon";
 import renderMarkdown from "@/utils/chat/markdown";
 import Citations from "../Citation";
+import ImagePreviewGallery from "../ImagePreview";
 import {
   THOUGHT_REGEX_CLOSE,
   THOUGHT_REGEX_COMPLETE,
@@ -17,6 +18,7 @@ const PromptReply = ({
   error,
   workspace,
   sources = [],
+  images = [],
   closed = true,
 }) => {
   const assistantBackgroundColor = "bg-theme-bg-chat";
@@ -73,6 +75,7 @@ const PromptReply = ({
           />
         </div>
         <Citations sources={sources} />
+        <ImagePreviewGallery images={images} />
       </div>
     </div>
   );

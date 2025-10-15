@@ -153,6 +153,7 @@ function convertToChatHistory(history = []) {
         role: "assistant",
         content: data.text,
         sources: data.sources || [],
+        images: data.images || [],
         chatId: id,
         sentAt: moment(createdAt).unix(),
         feedbackScore,

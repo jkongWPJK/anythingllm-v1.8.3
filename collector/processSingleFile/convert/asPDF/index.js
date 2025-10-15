@@ -6,6 +6,7 @@ const {
 } = require("../../../utils/files");
 const { tokenizeString } = require("../../../utils/tokenizer");
 const { default: slugify } = require("slugify");
+const { processDocumentImages } = require("../../../../utils/imagePipeline");
 const PDFLoader = require("./PDFLoader");
 const OCRLoader = require("../../../utils/OCRLoader");
 
@@ -66,6 +67,12 @@ async function asPdf({ fullFilePath = "", filename = "", options = {} }) {
     data,
     filename: `${slugify(filename)}-${data.id}`,
     options: { parseOnly: options.parseOnly },
+  });
+  await processDocumentImages({
+    type: "pdf",
+    filePath: fullFilePath,
+    document,
+    options,
   });
   trashFile(fullFilePath);
   console.log(`[SUCCESS]: ${filename} converted & ready for embedding.\n`);

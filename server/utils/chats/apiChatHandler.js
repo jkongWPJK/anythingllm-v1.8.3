@@ -14,6 +14,11 @@ const {
   EphemeralEventListener,
 } = require("../agents/ephemeral");
 const { Telemetry } = require("../../models/telemetry");
+const {
+  retrieveRelevantImages,
+  buildImageContext,
+  appendImageReferences,
+} = require("../imageRetriever");
 
 /**
  * @typedef ResponseObject
@@ -256,6 +261,18 @@ async function chatSync({
   contextTexts = [...contextTexts, ...filledSources.contextTexts];
   sources = [...sources, ...vectorSearchResults.sources];
 
+  let imageResults = [];
+  try {
+    imageResults = await retrieveRelevantImages({
+      query: message,
+      topK: Math.max(1, Math.min(workspace?.topN || 4, 6)),
+    });
+    const imageContext = buildImageContext(imageResults);
+    if (imageContext) contextTexts.push(imageContext);
+  } catch (error) {
+    console.error("Image retrieval failed:", error.message);
+  }
+
   // If in query mode and no context chunks are found from search, backfill, or pins -  do not
   // let the LLM try to hallucinate a response or use general knowledge and exit early
   if (chatMode === "query" && contextTexts.length === 0) {
@@ -321,15 +338,18 @@ async function chatSync({
     };
   }
 
+  const finalResponse = appendImageReferences(textResponse, imageResults);
+
   const { chat } = await WorkspaceChats.new({
     workspaceId: workspace.id,
     prompt: message,
     response: {
-      text: textResponse,
+      text: finalResponse,
       sources,
       attachments,
       type: chatMode,
       metrics: performanceMetrics,
+      images: imageResults,
     },
     threadId: thread?.id || null,
     apiSessionId: sessionId,
@@ -342,8 +362,9 @@ async function chatSync({
     close: true,
     error: null,
     chatId: chat.id,
-    textResponse,
+    textResponse: finalResponse,
     sources,
+    images: imageResults,
     metrics: performanceMetrics,
   };
 }
@@ -593,6 +614,18 @@ async function streamChat({
   contextTexts = [...contextTexts, ...filledSources.contextTexts];
   sources = [...sources, ...vectorSearchResults.sources];
 
+  let imageResults = [];
+  try {
+    imageResults = await retrieveRelevantImages({
+      query: message,
+      topK: Math.max(1, Math.min(workspace?.topN || 4, 6)),
+    });
+    const imageContext = buildImageContext(imageResults);
+    if (imageContext) contextTexts.push(imageContext);
+  } catch (error) {
+    console.error("Image retrieval failed:", error.message);
+  }
+
   // If in query mode and no context chunks are found from search, backfill, or pins -  do not
   // let the LLM try to hallucinate a response or use general knowledge and exit early
   if (chatMode === "query" && contextTexts.length === 0) {
@@ -650,11 +683,12 @@ async function streamChat({
       await LLMConnector.getChatCompletion(messages, {
         temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
       });
-    completeText = textResponse;
+    completeText = appendImageReferences(textResponse, imageResults);
     metrics = performanceMetrics;
     writeResponseChunk(response, {
       uuid,
       sources,
+      images: imageResults,
       type: "textResponseChunk",
       textResponse: completeText,
       close: true,
@@ -670,6 +704,20 @@ async function streamChat({
       sources,
     });
     metrics = stream.metrics;
+    const appended = appendImageReferences(completeText || "", imageResults);
+    if (appended.length > (completeText || "").length) {
+      const extraText = appended.slice((completeText || "").length);
+      writeResponseChunk(response, {
+        uuid,
+        sources,
+        images: imageResults,
+        type: "textResponseChunk",
+        textResponse: extraText,
+        close: false,
+        error: false,
+      });
+    }
+    completeText = appended;
   }
 
   if (completeText?.length > 0) {
@@ -682,6 +730,7 @@ async function streamChat({
         type: chatMode,
         metrics,
         attachments,
+        images: imageResults,
       },
       threadId: thread?.id || null,
       apiSessionId: sessionId,
@@ -694,6 +743,7 @@ async function streamChat({
       close: true,
       error: false,
       chatId: chat.id,
+      images: imageResults,
       metrics,
     });
     return;
@@ -704,6 +754,7 @@ async function streamChat({
     type: "finalizeResponseStream",
     close: true,
     error: false,
+    images: imageResults,
   });
   return;
 }

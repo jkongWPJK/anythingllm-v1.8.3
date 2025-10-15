@@ -7,6 +7,7 @@ const {
 } = require("../../utils/files");
 const OCRLoader = require("../../utils/OCRLoader");
 const { default: slugify } = require("slugify");
+const { processDocumentImages } = require("../../../utils/imagePipeline");
 
 async function asImage({ fullFilePath = "", filename = "", options = {} }) {
   let content = await new OCRLoader({
@@ -42,6 +43,12 @@ async function asImage({ fullFilePath = "", filename = "", options = {} }) {
     data,
     filename: `${slugify(filename)}-${data.id}`,
     options: { parseOnly: options.parseOnly },
+  });
+  await processDocumentImages({
+    type: "image",
+    filePath: fullFilePath,
+    document,
+    options,
   });
   trashFile(fullFilePath);
   console.log(`[SUCCESS]: ${filename} converted & ready for embedding.\n`);

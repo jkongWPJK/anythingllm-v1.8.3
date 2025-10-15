@@ -166,6 +166,7 @@ const Workspace = {
             type: "abort",
             textResponse: null,
             sources: [],
+            images: [],
             close: true,
             error: `An error occurred while streaming response. Code ${response.status}`,
           });
@@ -177,6 +178,7 @@ const Workspace = {
             type: "abort",
             textResponse: null,
             sources: [],
+            images: [],
             close: true,
             error: `An error occurred while streaming response. Unknown Error.`,
           });
@@ -196,6 +198,7 @@ const Workspace = {
           type: "abort",
           textResponse: null,
           sources: [],
+          images: [],
           close: true,
           error: `An error occurred while streaming response. ${err.message}`,
         });

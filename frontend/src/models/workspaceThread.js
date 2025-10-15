@@ -120,25 +120,27 @@ const WorkspaceThread = {
             response.status < 500 &&
             response.status !== 429
           ) {
-            handleChat({
-              id: v4(),
-              type: "abort",
-              textResponse: null,
-              sources: [],
-              close: true,
-              error: `An error occurred while streaming response. Code ${response.status}`,
-            });
+          handleChat({
+            id: v4(),
+            type: "abort",
+            textResponse: null,
+            sources: [],
+            images: [],
+            close: true,
+            error: `An error occurred while streaming response. Code ${response.status}`,
+          });
             ctrl.abort();
             throw new Error("Invalid Status code response.");
           } else {
-            handleChat({
-              id: v4(),
-              type: "abort",
-              textResponse: null,
-              sources: [],
-              close: true,
-              error: `An error occurred while streaming response. Unknown Error.`,
-            });
+          handleChat({
+            id: v4(),
+            type: "abort",
+            textResponse: null,
+            sources: [],
+            images: [],
+            close: true,
+            error: `An error occurred while streaming response. Unknown Error.`,
+          });
             ctrl.abort();
             throw new Error("Unknown error");
           }
@@ -150,14 +152,15 @@ const WorkspaceThread = {
           } catch {}
         },
         onerror(err) {
-          handleChat({
-            id: v4(),
-            type: "abort",
-            textResponse: null,
-            sources: [],
-            close: true,
-            error: `An error occurred while streaming response. ${err.message}`,
-          });
+        handleChat({
+          id: v4(),
+          type: "abort",
+          textResponse: null,
+          sources: [],
+          images: [],
+          close: true,
+          error: `An error occurred while streaming response. ${err.message}`,
+        });
           ctrl.abort();
           throw new Error();
         },
