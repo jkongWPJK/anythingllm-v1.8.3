@@ -330,6 +330,7 @@ function buildMessages({
           reply={props.content}
           pending={props.pending}
           sources={props.sources}
+          images={props.images}
           error={props.error}
           workspace={workspace}
           closed={props.closed}
@@ -343,6 +344,7 @@ function buildMessages({
           role={props.role}
           workspace={workspace}
           sources={props.sources}
+          images={props.images}
           feedbackScore={props.feedbackScore}
           chatId={props.chatId}
           error={props.error}
