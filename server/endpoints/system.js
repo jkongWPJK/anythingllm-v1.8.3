@@ -61,6 +61,8 @@ const {
 const { TemporaryAuthToken } = require("../models/temporaryAuthToken");
 const { SystemPromptVariables } = require("../models/systemPromptVariables");
 const { VALID_COMMANDS } = require("../utils/chats");
+const { EXTRACTION_DIR } = require("../../shared/imageVectorStore");
+const mime = require("mime");
 
 function systemEndpoints(app) {
   if (!app) return;
@@ -691,6 +693,50 @@ function systemEndpoints(app) {
       } catch (error) {
         console.error("Error processing the logo request:", error);
         response.status(500).json({ message: "Internal server error" });
+      }
+    }
+  );
+
+  app.get(
+    "/system/extracted-image",
+    [validatedRequest, flexUserRoleValid([ROLES.all])],
+    async function (request, response) {
+      try {
+        const { path: imagePath } = queryParams(request);
+        if (!imagePath) {
+          response
+            .status(400)
+            .json({ message: "Image path is required." });
+          return;
+        }
+
+        let normalizedPath = normalizePath(String(imagePath));
+        if (!normalizedPath.startsWith("extracted_img")) {
+          normalizedPath = normalizePath(
+            path.join("extracted_img", normalizedPath)
+          );
+        }
+
+        const absolutePath = path.resolve(
+          __dirname,
+          "../../..",
+          normalizedPath
+        );
+
+        if (
+          !isWithin(EXTRACTION_DIR, absolutePath) ||
+          !fs.existsSync(absolutePath)
+        ) {
+          response.sendStatus(404).end();
+          return;
+        }
+
+        const mimeType = mime.getType(absolutePath) || "image/png";
+        response.setHeader("Content-Type", mimeType);
+        response.sendFile(absolutePath);
+      } catch (error) {
+        console.error("Failed to serve extracted image:", error.message);
+        response.status(500).json({ message: "Failed to load image." });
       }
     }
   );

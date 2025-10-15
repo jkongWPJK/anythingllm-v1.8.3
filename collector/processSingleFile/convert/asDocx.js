@@ -7,6 +7,7 @@ const {
 } = require("../../utils/files");
 const { tokenizeString } = require("../../utils/tokenizer");
 const { default: slugify } = require("slugify");
+const { processDocumentImages } = require("../../../utils/imagePipeline");
 
 async function asDocX({ fullFilePath = "", filename = "", options = {} }) {
   const loader = new DocxLoader(fullFilePath);
@@ -49,6 +50,12 @@ async function asDocX({ fullFilePath = "", filename = "", options = {} }) {
     data,
     filename: `${slugify(filename)}-${data.id}`,
     options: { parseOnly: options.parseOnly },
+  });
+  await processDocumentImages({
+    type: "docx",
+    filePath: fullFilePath,
+    document,
+    options,
   });
   trashFile(fullFilePath);
   console.log(`[SUCCESS]: ${filename} converted & ready for embedding.\n`);
