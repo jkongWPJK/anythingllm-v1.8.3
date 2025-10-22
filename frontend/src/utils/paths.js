@@ -69,7 +69,7 @@ export default {
   },
   workspace: {
     chat: (slug, options = {}) => {
-      return applyOptions(`/workspace/${slug}`, options);
+      return applyOptions(`/llm/workspace/${slug}`, options);
     },
     settings: {
       generalAppearance: (slug) => {
