@@ -236,7 +236,7 @@ function OptionsMenu({
       onRemove(thread.id);
       // Redirect if deleting the active thread
       if (currentThreadSlug === thread.slug) {
-        window.location.href = "/llm"+ paths.workspace.chat(workspace.slug);
+        window.location.href = paths.workspace.chat(workspace.slug);
       }
       return;
     }
