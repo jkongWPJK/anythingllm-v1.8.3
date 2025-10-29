@@ -20,6 +20,7 @@ import paths from "@/utils/paths";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { chatQueryRefusalResponse } from "@/utils/chat";
+import ImagePreviewGallery from "../ImagePreview";
 
 const HistoricalMessage = ({
   uuid = v4(),
@@ -27,6 +28,7 @@ const HistoricalMessage = ({
   role,
   workspace,
   sources = [],
+  images = [],
   attachments = [],
   error = false,
   feedbackScore = null,
@@ -152,7 +154,12 @@ const HistoricalMessage = ({
             alignmentCls={alignmentCls}
           />
         </div>
-        {role === "assistant" && <Citations sources={sources} />}
+        {role === "assistant" && (
+          <>
+            <Citations sources={sources} />
+            <ImagePreviewGallery images={images} />
+          </>
+        )}
       </div>
     </div>
   );
